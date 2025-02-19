@@ -124,4 +124,6 @@ print("Reports generated successfully!")
 
 # Close connection
 conn.close()
+```
+
 
