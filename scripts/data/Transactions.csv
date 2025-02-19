@@ -1,0 +1,11 @@
+TransactionID,Type,Amount,ClientID,TransactionDate,Currency
+1,New Business,1000000.00,1,2025/05/01,ZAR
+2,New Business,500000.00,2,2025/05/01,ZAR
+3,Additional investment,10000.00,1,2025/09/01,ZAR
+4,New Business,3000000.00,3,2025/10/01,ZAR
+5,New Business,3000.00,4,2025/01/15,USD
+6,New Business,22500.00,5,2025/01/23,ZAR
+7,Withdrawal,5000.00,1,2025/01/31,ZAR
+8,Withdrawal,10000.00,2,2025/01/31,ZAR
+9,Additional investment,300000.00,3,2025/03/02,ZAR
+10,Switch,500.00,4,2025/08/02,USD

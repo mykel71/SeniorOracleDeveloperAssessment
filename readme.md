@@ -84,7 +84,7 @@ CREATE TABLE Clients (
 CREATE TABLE Transactions (
     TransactionID INT PRIMARY KEY,
     Type VARCHAR(50),
-    Amount NUMBER(10,2),
+    Amount DECIMAL(10,2),
     ClientID INT,
     TransactionDate DATE,
     Currency VARCHAR(10),
@@ -94,48 +94,34 @@ CREATE TABLE Transactions (
 
 ### 2. Generating Reports in CSV using Python
 
-#### **Financial Adviser Report**
+#### **Reports**
 ```python
-import cx_Oracle
-import csv
+# Reconnect to SQL Server
+conn = pyodbc.connect('DRIVER={SQL Server};SERVER=MICHAELS;DATABASE=SQLAssessmentDB;Trusted_Connection=yes;')
 
-connection = cx_Oracle.connect("user/password@hostname:port/service_name")
-cursor = connection.cursor()
+# Queries for reports
+queries = {
+    "reports/financial_adviser_report.csv": """
+        SELECT a.Name AS AdvisorName, c.Name AS ClientName, c.Telephone 
+        FROM Advisers a
+        JOIN Clients c ON a.AdvisorID = c.AdvisorID
+        ORDER BY a.Name;
+    """,
+    "reports/client_transaction_report.csv": """
+        SELECT c.Name AS ClientName, t.Type, t.Amount, t.TransactionDate, t.Currency
+        FROM Clients c
+        JOIN Transactions t ON c.ClientID = t.ClientID
+        ORDER BY c.Name, t.TransactionDate;
+    """
+}
 
-query = """
-SELECT a.Name AS AdvisorName, c.Name AS ClientName, c.Telephone 
-FROM Advisers a
-JOIN Clients c ON a.AdvisorID = c.AdvisorID
-ORDER BY a.Name;
-"""
+# Export results
+for filename, query in queries.items():
+    df = pd.read_sql(query, conn)
+    df.to_csv(filename, index=False)
 
-cursor.execute(query)
-rows = cursor.fetchall()
+print("Reports generated successfully!")
 
-with open("financial_adviser_report.csv", "w", newline="") as file:
-    writer = csv.writer(file)
-    writer.writerow(["Advisor Name", "Client Name", "Telephone"])
-    writer.writerows(rows)
-
-cursor.close()
-connection.close()
-```
-
-#### **Client Transaction Report**
-```python
-query = """
-SELECT c.Name AS ClientName, t.Type, t.Amount, t.TransactionDate, t.Currency
-FROM Clients c
-JOIN Transactions t ON c.ClientID = t.ClientID
-ORDER BY c.Name, t.TransactionDate;
-"""
-
-cursor.execute(query)
-rows = cursor.fetchall()
-
-with open("client_transaction_report.csv", "w", newline="") as file:
-    writer = csv.writer(file)
-    writer.writerow(["Client Name", "Transaction Type", "Amount", "Date", "Currency"])
-    writer.writerows(rows)
-```
+# Close connection
+conn.close()
 
